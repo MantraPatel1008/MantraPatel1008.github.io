@@ -1,0 +1,48 @@
+{
+  "id": "workflow-lead-outreach",
+  "name": "Lead Discovery to Outreach",
+  "description": "Automatically find leads and send outreach",
+  "trigger": {
+    "type": "manual",
+    "name": "Start workflow"
+  },
+  "actions": [
+    {
+      "id": "action-1",
+      "type": "agent_call",
+      "order": 1,
+      "config": {
+        "agent": "LeadFinder",
+        "input": {
+          "industry": "gym",
+          "region": "New York",
+          "limit": 50
+        }
+      }
+    },
+    {
+      "id": "action-2",
+      "type": "agent_call",
+      "order": 2,
+      "config": {
+        "agent": "Outreach",
+        "input": {
+          "leadsFromPrevious": true,
+          "messageTemplate": "cold_email_gym",
+          "channels": ["email"]
+        }
+      }
+    },
+    {
+      "id": "action-3",
+      "type": "notification",
+      "order": 3,
+      "config": {
+        "channel": "slack",
+        "message": "Outreach campaign completed. {leads_found} leads found, {messages_sent} messages sent."
+      }
+    }
+  ],
+  "isActive": true,
+  "createdAt": "2024-01-15T10:00:00Z"
+}
