@@ -1,39 +1,48 @@
 {
   "name": "jarvis-os",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Autonomous AI Business Operating System",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
+    "dev": "ts-node src/api/server.ts",
+    "start": "node dist/src/api/server.js",
+    "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src/",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "db:migrate": "ts-node scripts/migrate.ts"
   },
   "keywords": [
     "ai",
     "automation",
     "agents",
     "business",
-    "autonomous"
+    "autonomous",
+    "jarvis"
   ],
   "author": "MantraPatel1008",
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.3.0",
+    "@supabase/supabase-js": "^2.38.0",
     "axios": "^1.6.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.0",
     "express": "^4.18.0",
-    "pinecone-client": "^1.1.0",
-    "supabase": "^1.0.0",
     "node-cron": "^3.0.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
+    "@types/cors": "^2.8.15",
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.0.0",
+    "@types/jest": "^29.5.0",
     "eslint": "^8.50.0",
+    "jest": "^29.7.0",
     "prettier": "^3.0.0",
-    "@types/node": "^20.0.0"
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.2.0"
   }
 }
