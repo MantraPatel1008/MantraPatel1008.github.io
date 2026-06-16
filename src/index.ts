@@ -1,57 +1,72 @@
 import dotenv from 'dotenv';
+import { JarvisCore } from './core/jarvis_core';
 import { Logger } from './utils/logger';
-import { JarvisOrchestrator } from './core/orchestrator';
-import { MemoryEngine } from './memory/memory_store';
-import { LeadFinderAgent } from './agents/lead_finder/lead_finder';
-import { OutreachAgent } from './agents/outreach/outreach';
-import { ContentCreatorAgent } from './agents/content_creator/content_creator';
 
 // Load environment variables
 dotenv.config();
 
-const logger = new Logger('JARVIS');
+const logger = new Logger('Main');
+let jarvisCore: JarvisCore;
 
 /**
- * Main entry point for JARVIS OS
+ * Main Entry Point for JARVIS OS
  */
-async function initialize() {
-  logger.info('🤖 JARVIS OS Initializing...');
+async function main() {
+  logger.info('🚀 JARVIS OS Starting...');
+  logger.info('═'.repeat(50));
 
   try {
-    // Initialize memory engine
-    const memory = new MemoryEngine(new Logger('Memory'));
-    logger.info('✅ Memory engine initialized');
+    // Initialize JARVIS Core
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY not set in environment variables');
+    }
 
-    // Initialize orchestrator
-    const orchestrator = new JarvisOrchestrator(memory, logger);
-    logger.info('✅ Orchestrator initialized');
+    jarvisCore = new JarvisCore(apiKey);
+    await jarvisCore.initialize();
 
-    // Register agents
-    orchestrator.registerAgent('LeadFinder', new LeadFinderAgent(new Logger('LeadFinder')));
-    orchestrator.registerAgent('Outreach', new OutreachAgent(new Logger('Outreach')));
-    orchestrator.registerAgent('ContentCreator', new ContentCreatorAgent(new Logger('ContentCreator')));
-    logger.info('✅ Agents registered');
+    // Get and display status
+    const status = jarvisCore.getStatus();
+    logger.info('\n📊 System Status:');
+    logger.info(JSON.stringify(status, null, 2));
 
-    // Log system status
-    const status = orchestrator.getStatus();
-    logger.info(`System Status: ${JSON.stringify(status)}`);
+    // Example command
+    logger.info('\n📝 Processing example command...');
+    const result = await jarvisCore.processCommand(
+      'Create a LinkedIn post about AI marketing and an Instagram reel script',
+      {
+        company: 'Slay Ads',
+        industry: 'Digital Marketing',
+      }
+    );
 
-    // TODO: Start orchestrator
-    // await orchestrator.start();
+    logger.info('\n✅ Command executed:');
+    logger.info(JSON.stringify(result, null, 2));
 
-    return orchestrator;
+    logger.info('\n═'.repeat(50));
+    logger.info('🎉 JARVIS OS is ready!');
+    logger.info('Commands can be sent via API or CLI');
   } catch (error) {
-    logger.error('Initialization failed', error);
-    throw error;
+    logger.error('Fatal error during startup', error);
+    process.exit(1);
   }
 }
 
-// Run if this is the main module
+// Handle graceful shutdown
+process.on('SIGINT', async () => {
+  logger.info('\n\n🛑 Shutting down gracefully...');
+  if (jarvisCore) {
+    await jarvisCore.shutdown();
+  }
+  process.exit(0);
+});
+
+// Run main function
 if (require.main === module) {
-  initialize().catch(error => {
-    logger.error('Fatal error', error);
+  main().catch(error => {
+    logger.error('Failed to start JARVIS OS', error);
     process.exit(1);
   });
 }
 
-export { initialize };
+export { JarvisCore };
